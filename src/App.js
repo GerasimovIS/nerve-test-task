@@ -1,25 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import './App.css'
+import { Layout, Input } from 'antd'
+import PostsList from './components/PostsList'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchPostsAction } from './store/postReducer'
 
-function App() {
+const { Header, Content } = Layout
+
+function App () {
+  const [searchValue, setSearchValue] = useState('')
+  const [currentlyDisplayed, setCurrentlyDisplayed] = useState([])
+
+  const posts = useSelector(state => state.postReducer.posts)
+  const dispatch = useDispatch()
+
+  const loadPosts = () => {
+    dispatch(fetchPostsAction())
+  }
+
+  const searchPosts = (searchText) => {
+    setSearchValue(searchText)
+    setCurrentlyDisplayed(posts.filter(i => i.body.includes(searchText)))
+  }
+
+  useEffect(() => loadPosts(), [])
+  useEffect(() => setCurrentlyDisplayed(posts), [posts])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Layout className="root-layout">
+      <Header>
+        <Input
+          placeholder="Search..."
+          value={searchValue}
+          onChange={(e) => searchPosts(e.target.value)}
+        />
+      </Header>
+      <Content className="site-layout" style={{ padding: '0 50px', marginTop: 20 }}>
+        <div className="site-layout-background" style={{ padding: 24 }}>
+          {
+            posts.length <= 0
+              ? <div style={{ textAlign: 'center' }}>No data</div>
+              : <PostsList posts={currentlyDisplayed} />
+          }
+        </div>
+      </Content>
+    </Layout>
+  )
 }
 
-export default App;
+export default App

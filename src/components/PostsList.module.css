@@ -1,0 +1,11 @@
+.root {
+
+}
+
+.item {
+  cursor: pointer;
+  /* user-select: none; */
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px !important;
+}
